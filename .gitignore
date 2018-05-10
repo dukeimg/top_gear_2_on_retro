@@ -1,0 +1,2 @@
+venv
+!venv/lib/python3.6/site-packages/retro/data/TopGear2-Genesis/*
