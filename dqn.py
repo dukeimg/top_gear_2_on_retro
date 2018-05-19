@@ -37,11 +37,12 @@ def stack_frames(stacked_frames, state):
 
 
 def render(img):
-    viewer.imshow(img[100:208, 0:256])
+    viewer.imshow(img[10:208, 0:256])
+    # viewer.imshow(img[125:208, 42:214])
     
 
 def process_image(img):
-    img = img[100:208, 0:256]
+    img = img[125:208, 42:214]
     return np.mean(img, -1)
 
 
@@ -65,7 +66,7 @@ action_space = [
 # MODEL HYPERPARAMETERS
 stack_size = 4
 
-frame_shape = [108, 256]
+frame_shape = [83, 172]
 stacked_frame_shape = [*frame_shape, stack_size]
 state_size = stacked_frame_shape      # Our input is a stack of 4 frames hence 84x84x4 (Width, height, channels)
 action_size = action_space.__len__()
@@ -171,6 +172,11 @@ if training:
                 step += 1
                 # Increase decay_step
                 decay_step += 1
+
+                if step < 475:
+                    env.step(env.action_space.sample())
+                    render(env.img)
+                    continue
 
                 ## EPSILON GREEDY STRATEGY
                 # Choose action a from state s using epsilon greedy.
