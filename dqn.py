@@ -6,7 +6,6 @@ import argparse
 import retro
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 from collections import deque
 from gym.envs.classic_control.rendering import SimpleImageViewer
@@ -38,11 +37,11 @@ def stack_frames(stacked_frames, state):
 
 
 def render(img):
-    viewer.imshow(img[10:208, 0:256])
+    viewer.imshow(img[100:208, 0:256])
     
 
 def process_image(img):
-    img = img[10:208, 0:256]
+    img = img[100:208, 0:256]
     return np.mean(img, -1)
 
 
@@ -66,9 +65,9 @@ action_space = [
 # MODEL HYPERPARAMETERS
 stack_size = 4
 
-frame_shape = [198, 256]
+frame_shape = [108, 256]
 stacked_frame_shape = [*frame_shape, stack_size]
-state_size = [198, 256, 4]      # Our input is a stack of 4 frames hence 84x84x4 (Width, height, channels)
+state_size = stacked_frame_shape      # Our input is a stack of 4 frames hence 84x84x4 (Width, height, channels)
 action_size = action_space.__len__()
 learning_rate = 0.0002      # Alpha (aka learning rate)
 
@@ -148,7 +147,11 @@ saver = tf.train.Saver()
 if training:
     rewards_list = []
 
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    config.intra_op_parallelism_threads = 4
+    config.inter_op_parallelism_threads = 4
+
+    with tf.Session(config=config) as sess:
         # Initialize the variables
         sess.run(tf.global_variables_initializer())
 
@@ -187,6 +190,7 @@ if training:
 
                     # Take the biggest Q value (= the best action)
                     action = np.argmax(Qs)
+                    action = action_space[int(action)]
 
                 # Do the action
                 next_state, reward, done, info = env.step(action)
@@ -262,6 +266,8 @@ if training:
                 writer.flush()
 
             # Save model every 5 episodes
-            if episode % 5 == 0:
-                save_path = saver.save(sess, "./models/model.ckpt")
-                print("Model Saved")
+            # if episode % 5 == 0:
+
+            # Save model every episode
+            save_path = saver.save(sess, "./models/model.ckpt")
+            print("Model Saved")
