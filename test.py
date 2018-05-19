@@ -21,7 +21,7 @@ try:
         totrew = 0
         while True:
             ac = env.action_space.sample()
-            ob, rew, done, info = env.step(ac)
+            ob, rew, done, info = env.step([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             t += 1
             if t % 10 == 0:
                 if verbosity > 1:

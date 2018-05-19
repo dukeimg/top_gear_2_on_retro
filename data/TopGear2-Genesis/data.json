@@ -1,0 +1,20 @@
+{
+  "info": {
+    "lap": {
+      "address": 16718228,
+      "type": ">u2"
+    },
+    "speed": {
+      "address": 16718040,
+      "type": ">u2"
+    },
+    "position": {
+      "address": 16718236,
+      "type": ">u2"
+    },
+    "finished": {
+      "address": 16720694,
+      "type": ">u2"
+    }
+  }
+}
