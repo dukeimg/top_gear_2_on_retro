@@ -12,7 +12,7 @@ class DQNetwork:
             # *state_size means that we take each elements of state_size in tuple hence is like if we wrote
             # [None, 84, 84, 4]
             self.inputs_ = tf.placeholder(tf.float32, [None, *state_size], name="inputs")
-            self.actions_ = tf.placeholder(tf.float32, [None, 3], name="actions_")
+            self.actions_ = tf.placeholder(tf.float32, [64, 12], name="actions_")
 
             # Remember that target_Q is the R(s,a) + ymax Qhat(s', a')
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
@@ -95,7 +95,7 @@ class DQNetwork:
 
             self.output = tf.layers.dense(inputs=self.fc,
                                           kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                                          units=3,
+                                          units=action_size,
                                           activation=None)
 
             # Q is our predicted Q value.
