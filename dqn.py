@@ -2,12 +2,12 @@
 
 import argparse
 import retro
-import tensorflow as tf      # Deep Learning library
-import numpy as np           # Handle matrices
-import random                # Handling random number generation
-from collections import deque# Ordered collection with ends
-import matplotlib.pyplot as plt # Display graphs
+import numpy as np
+import random
+from collections import deque
+import matplotlib.pyplot as plt
 from gym.envs.classic_control.rendering import SimpleImageViewer
+from dqn.memory import Memory
 
 parser = argparse.ArgumentParser()
 parser.add_argument('game', default='TopGear2-Genesis', help='the name or path for the game to run')
@@ -23,11 +23,8 @@ viewer = SimpleImageViewer()
 
 
 def stack_frames(stacked_frames, state):
-    # Preprocess frame
-    frame = state.img
-
     # Append frame to deque, automatically removes the oldest frame
-    stacked_frames.append(frame)
+    stacked_frames.append(state[10:208, 0:256])
 
     # Build the stacked state (first dimension specifies different frames)
     stacked_state = np.stack(stacked_frames, axis=2)
@@ -71,6 +68,34 @@ training = True
 
 
 stacked_frames = deque([np.zeros((198, 256, 3), dtype=np.int) for i in range(stack_size)], maxlen=4)
+
+# Instantiate memory
+memory = Memory(max_size=memory_size)
+
+for i in range(pretrain_length):
+    ac = env.action_space.sample()
+    ob, rew, done, info = env.step(ac)
+    state = stack_frames(stacked_frames, ob)
+
+    if done:
+        # We finished the episode
+        next_state = np.zeros(ob.shape)
+
+        # Add experience to memory
+        memory.add((ob, ac, rew, next_state, done))
+
+        # Start a new episode
+        env.reset()
+    else:
+        # Get the next state
+        next_state = ob
+        next_state = stack_frames(stacked_frames, next_state)
+
+        # Add experience to memory
+        memory.add((ob, ac, rew, next_state, done))
+
+        # Our state is now the next_state
+        state = next_state
 
 try:
     while True:
