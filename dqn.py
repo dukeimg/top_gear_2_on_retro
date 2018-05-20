@@ -38,44 +38,49 @@ def stack_frames(stacked_frames, state):
 
 def render(img):
     viewer.imshow(img[10:208, 0:256])
-    # viewer.imshow(img[125:208, 42:214])
+    # viewer.imshow(img[135:208, 42:214])
     
 
 def process_image(img):
-    img = img[125:208, 42:214]
+    img = img[135:208, 42:214]
     return np.mean(img, -1)
 
 
 env = retro.make(args.game, args.state or retro.STATE_DEFAULT, scenario=args.scenario, record=args.record)
 
 action_space = [
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
 ]
+
+possible_actions = np.identity(6, dtype=int).tolist()
+
+
+# high — possible_actions instance
+# low — action_space instance
+def convert_action(high=None, low=None):
+    if high:
+        return action_space[possible_actions.index(high)]
+    elif low:
+        return possible_actions[action_space.index(low)]
 
 # MODEL HYPERPARAMETERS
 stack_size = 4
 
-frame_shape = [83, 172]
+frame_shape = [73, 172]
 stacked_frame_shape = [*frame_shape, stack_size]
 state_size = stacked_frame_shape      # Our input is a stack of 4 frames hence 84x84x4 (Width, height, channels)
-action_size = action_space.__len__()
+action_size = possible_actions.__len__()
 learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # TRAINING HYPERPARAMETERS
-total_episodes = 5000        # Total episodes for training
+total_episodes = 100        # Total episodes for training
 max_steps = 12000            # Max possible steps in an episode
-batch_size = 64
+batch_size = 8
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
@@ -90,8 +95,7 @@ pretrain_length = batch_size
 memory_size = 50000
 
 # MODIFY THIS TO FALSE IF YOU JUST WANT TO SEE THE TRAINED AGENT
-training = False
-
+training = True
 
 stacked_frames = deque([np.zeros(frame_shape, dtype=np.int) for i in range(stack_size)], maxlen=4)
 
@@ -118,7 +122,7 @@ for i in range(pretrain_length):
         next_state = np.zeros(stacked_frame_shape, dtype=np.int)
 
         # Add experience to memory
-        memory.add((state, ac, rew, next_state, done))
+        memory.add((state, convert_action(low=ac), rew, next_state, done))
 
         # Start a new episode
         env.reset()
@@ -128,7 +132,7 @@ for i in range(pretrain_length):
         next_state = stack_frames(stacked_frames, next_state)
 
         # Add experience to memory
-        memory.add((state, ac, rew, next_state, done))
+        memory.add((state, convert_action(low=ac), rew, next_state, done))
 
         # Our state is now the next_state
         state = next_state
@@ -150,19 +154,21 @@ if training:
 
     config = tf.ConfigProto()
     config.intra_op_parallelism_threads = 4
-    config.inter_op_parallelism_threads = 4
+    config.inter_op_parallelism_threads = 0
 
     with tf.Session(config=config) as sess:
         # Initialize the variables
         sess.run(tf.global_variables_initializer())
 
         decay_step = 0
+        max_steps = 0
 
         for episode in range(total_episodes):
             # Make new episode
             env.reset()
             total_reward = 0
             step = 0
+            max_steps += 100
 
             # Observe the first state
             frame = process_image(env.img)
@@ -188,7 +194,7 @@ if training:
 
                 if explore_probability > exp_exp_tradeoff:
                     # Make a random action
-                    action = random.choice(action_space)
+                    action = random.choice(possible_actions)
                 else:
                     # Get action from Q-network
                     # Estimate the Qs values state
@@ -196,11 +202,9 @@ if training:
 
                     # Take the biggest Q value (= the best action)
                     action = np.argmax(Qs)
-                    action = action_space[int(action)]
-
+                    action = possible_actions[int(action)]
                 # Do the action
-                next_state, reward, done, info = env.step(action)
-                action_index = action_space.index(action)
+                next_state, reward, done, info = env.step(convert_action(high=action))
                 total_reward += reward
 
                 render(env.img)
@@ -213,13 +217,6 @@ if training:
 
                     # Set step = max_steps to end the episode
                     step = max_steps
-
-                    print('Episode: {}'.format(episode),
-                          'Total reward: {}'.format(total_reward),
-                          'Training loss: {:.4f}'.format(loss),
-                          'Explore P: {:.4f}'.format(explore_probability))
-
-                    rewards_list.append((episode, total_reward))
 
                     memory.add((state, action, reward, next_state, done))
 
@@ -275,6 +272,13 @@ if training:
             # if episode % 5 == 0:
 
             # Save model every episode
+            print('Episode: {}'.format(episode),
+                  'Total reward: {}'.format(total_reward),
+                  'Training loss: {:.4f}'.format(loss),
+                  'Explore P: {:.4f}'.format(explore_probability))
+
+            rewards_list.append((episode, total_reward))
+
             save_path = saver.save(sess, "./models/model.ckpt")
             print("Model Saved")
 

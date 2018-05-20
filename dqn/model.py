@@ -12,7 +12,7 @@ class DQNetwork:
             # *state_size means that we take each elements of state_size in tuple hence is like if we wrote
             # [None, 84, 84, 4]
             self.inputs_ = tf.placeholder(tf.float32, [None, *state_size], name="inputs")
-            self.actions_ = tf.placeholder(tf.float32, [64, 12], name="actions_")
+            self.actions_ = tf.placeholder(tf.float32, [8, action_size], name="actions_")
 
             # Remember that target_Q is the R(s,a) + ymax Qhat(s', a')
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
