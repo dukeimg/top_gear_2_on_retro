@@ -85,7 +85,7 @@ batch_size = 8
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
 explore_stop = 0.01            # minimum exploration probability
-decay_rate = 0.0001            # exponential decay rate for exploration prob
+decay_rate = 0.00001           # exponential decay rate for exploration prob
 
 # Q learning hyperparameters
 gamma = 0.99
