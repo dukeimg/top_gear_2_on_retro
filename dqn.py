@@ -90,7 +90,7 @@ pretrain_length = batch_size
 memory_size = 50000
 
 # MODIFY THIS TO FALSE IF YOU JUST WANT TO SEE THE TRAINED AGENT
-training = True
+training = False
 
 
 stacked_frames = deque([np.zeros(frame_shape, dtype=np.int) for i in range(stack_size)], maxlen=4)
@@ -173,10 +173,10 @@ if training:
                 # Increase decay_step
                 decay_step += 1
 
-                if step < 475:
-                    env.step(env.action_space.sample())
-                    render(env.img)
-                    continue
+                # if step < 475:
+                #     env.step(env.action_space.sample())
+                #     render(env.img)
+                #     continue
 
                 ## EPSILON GREEDY STRATEGY
                 # Choose action a from state s using epsilon greedy.
@@ -277,3 +277,26 @@ if training:
             # Save model every episode
             save_path = saver.save(sess, "./models/model.ckpt")
             print("Model Saved")
+
+
+with tf.Session() as sess:
+    saver.restore(sess, "./models/model.ckpt")
+    done = False
+
+    env.reset()
+
+    step = 0
+    total_reward = 0
+    while not done:
+        step += 1
+        render(env.img)
+        frame = process_image(env.img)
+        state = stack_frames(stacked_frames, frame)
+        # Take the biggest Q value (= the best action)
+        Qs = sess.run(DQNetwork.output, feed_dict={DQNetwork.inputs_: state.reshape((1, *state.shape))})
+        action = np.argmax(Qs)
+        action = action_space[int(action)]
+        next_state, reward, done, info = env.step(action)
+        total_reward += reward
+    print('Race finished at t=%i got reward: %d' % (step, total_reward))
+    exit(0)
