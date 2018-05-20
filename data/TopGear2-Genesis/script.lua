@@ -5,12 +5,16 @@ function reward ()
   newspeed = data.speed
   newpostion = data.position
 
-  --speedreward = (newspeed - oldspeed) / 500.0
-  speedreward = (newspeed / 500) * (newspeed / 5000)
+  if newspeed > oldspeed then
+    x = 500
+  else
+    x = 1000
+  end
+  speedreward = (newspeed - oldspeed) / x
   newreward = newreward + speedreward
 
   --Slowdown penalty
-  if (oldspeed - newspeed) / oldspeed > 0.1 then
+  if (oldspeed - newspeed) / oldspeed > 0.3 then
     newreward = newreward - 1000
   end
 

@@ -92,7 +92,7 @@ gamma = 0.99
 
 # MEMORY HYPERPARAMETERS
 pretrain_length = batch_size
-memory_size = 50000
+memory_size = 500000
 
 # MODIFY THIS TO FALSE IF YOU JUST WANT TO SEE THE TRAINED AGENT
 training = True
@@ -161,14 +161,14 @@ if training:
         sess.run(tf.global_variables_initializer())
 
         decay_step = 0
-        max_steps = 0
+        min_position = 20
 
         for episode in range(total_episodes):
             # Make new episode
             env.reset()
             total_reward = 0
             step = 0
-            max_steps += 100
+            max_steps = 500 * (21 - min_position)
 
             # Observe the first state
             frame = process_image(env.img)

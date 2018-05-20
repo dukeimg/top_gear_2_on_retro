@@ -3,3 +3,4 @@ venv
 .idea
 tensorboard
 models
+models_history
