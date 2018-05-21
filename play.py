@@ -82,5 +82,7 @@ with tf.Session() as sess:
         action = np.argmax(Qs)
         action = action_space[int(action)]
         next_state, reward, done, info = env.step(action)
+        while np.array_equal(frame_shape, process_image(next_state)):
+            next_state, reward, done, info = env.step(action)
     print('Race finished at t=%i, position: %i' % (step, info.get('position')))
     exit(0)

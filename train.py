@@ -45,8 +45,8 @@ learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # Training hyperparameters
 total_episodes = 100        # Total episodes for training
-max_steps = 3000            # Max possible steps in an episode
-batch_size = 64
+max_steps = 12000            # Max possible steps in an episode
+batch_size = 32
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
@@ -150,7 +150,8 @@ config.intra_op_parallelism_threads = 0
 config.inter_op_parallelism_threads = 0
 with tf.Session(config=config) as sess:
     # Initialize the variables
-    sess.run(tf.global_variables_initializer())
+    # sess.run(tf.global_variables_initializer())
+    saver.restore(sess, "./models/model-2018-05-21 20:56:02.ckpt")
 
     decay_step = 0
     min_position = 20
@@ -190,15 +191,19 @@ with tf.Session(config=config) as sess:
                 action = np.argmax(Qs)
                 action = possible_actions[int(action)]
             # Do the action
+            prev_state = env.img
             next_state, reward, done, info = env.step(convert_action(high=action))
+            while np.array_equal(process_image(prev_state), process_image(next_state)):
+                step += 1
+                next_state, reward, done, info = env.step(convert_action(high=action))
             total_reward += reward
 
             render(env.img)
 
             # If the game is finished
-            if done:
+            if done or info.get('lap') == 1:
                 # the episode ends so no next state
-                next_state = np.zeros(stacked_frame_shape, dtype=np.int)
+                next_state = np.zeros(frame_shape, dtype=np.int)
                 next_state = stack_frames(stacked_frames, next_state)
 
                 # Set step = max_steps to end the episode

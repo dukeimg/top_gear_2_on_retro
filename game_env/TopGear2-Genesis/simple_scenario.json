@@ -10,11 +10,11 @@
     "variables": {
       "speed": {
         "penalty": 1,
-        "reward": 1
+        "reward": 2
       },
       "position": {
-        "penalty": 1000,
-        "reward": 1000
+        "penalty": 10000,
+        "reward": 10000
       }
     }
   }
