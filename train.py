@@ -150,8 +150,8 @@ config.intra_op_parallelism_threads = 0
 config.inter_op_parallelism_threads = 0
 with tf.Session(config=config) as sess:
     # Initialize the variables
-    # sess.run(tf.global_variables_initializer())
-    saver.restore(sess, "./models/model-2018-05-21 20:56:02.ckpt")
+    sess.run(tf.global_variables_initializer())
+    # saver.restore(sess, "./models/model-2018-05-21 20:56:02.ckpt")
 
     decay_step = 0
     min_position = 20
@@ -197,6 +197,11 @@ with tf.Session(config=config) as sess:
                 step += 1
                 next_state, reward, done, info = env.step(convert_action(high=action))
             total_reward += reward
+
+            # TODO: show in verbose mode
+            # print(reward)
+            # if info.get('side') == 255 and info.get('pos') < 35 or info.get('side') == 0 and info.get('pos') > 220:
+            #     print('Grass!')
 
             render(env.img)
 

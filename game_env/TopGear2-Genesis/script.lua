@@ -1,35 +1,23 @@
-oldspeed = 0
+-- oldspeed = 0
 oldposition = 1
 function reward ()
   newreward = 0
   newspeed = data.speed
   newpostion = data.position
 
-  if newspeed > 1000 then
-    if newspeed > oldspeed then
-      x = 500
-    else
-      x = 1000
-    end
-    speedreward = (newspeed - oldspeed) / x
-  else
-    speedreward = -1
-  end
+  speedreward = (newspeed - 4000) / 2500.0
+
   newreward = newreward + speedreward
 
-  --Slowdown penalty
-  if (oldspeed - newspeed) / oldspeed > 0.3 then
-    newreward = newreward - 1000
+  -- if car goes on the grass on left side or right side
+  if data.side == 255 and data.pos < 35 or data.side == 0 and data.pos > 220 then
+    newreward = newreward - 100
   end
 
-  if oldposition - newpostion == 1 then
-    newreward = newreward + 10000
-  elseif oldposition - newpostion == -1 then
-    newreward = newreward - 10000
-  end
+  newreward = newreward + ((oldposition - newpostion) * 10000)
 
   oldposition = newpostion
-  oldspeed = newspeed
+  -- oldspeed = newspeed
 
   return newreward
 end

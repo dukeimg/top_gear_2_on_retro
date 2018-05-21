@@ -15,6 +15,14 @@
     "finished": {
       "address": 16720694,
       "type": ">u2"
+    },
+    "side": {
+      "address": 16718030,
+      "type": ">u1"
+    },
+    "pos": {
+      "address": 16718031,
+      "type": ">u1"
     }
   }
 }
