@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import random
+import datetime
+import subprocess
 
 import argparse
 import retro
@@ -44,7 +46,7 @@ learning_rate = 0.0002      # Alpha (aka learning rate)
 # Training hyperparameters
 total_episodes = 100        # Total episodes for training
 max_steps = 3000            # Max possible steps in an episode
-batch_size = 1
+batch_size = 64
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
@@ -75,7 +77,6 @@ def stack_frames(stacked_frames, state):
 
 def render(img):
     viewer.imshow(img[10:208, 0:256])
-    # viewer.imshow(img[135:208, 42:214])
 
 
 def process_image(img):
@@ -98,7 +99,7 @@ stacked_frames = deque([np.zeros(frame_shape, dtype=np.int) for i in range(stack
 tf.reset_default_graph()
 
 # Instantiate the DQNetwork
-DQNetwork = DQNetwork(state_size, action_size, learning_rate)
+DQNetwork = DQNetwork(state_size, action_size, learning_rate, batch_size)
 
 # Instantiate memory
 memory = Memory(max_size=memory_size)
@@ -145,7 +146,7 @@ write_op = tf.summary.merge_all()
 saver = tf.train.Saver()
 
 config = tf.ConfigProto()
-config.intra_op_parallelism_threads = 4
+config.intra_op_parallelism_threads = 0
 config.inter_op_parallelism_threads = 0
 with tf.Session(config=config) as sess:
     # Initialize the variables
@@ -258,5 +259,10 @@ with tf.Session(config=config) as sess:
               'Explore P: {:.4f}'.format(explore_probability))
 
         # Save model every 5 episodes
-        save_path = saver.save(sess, "./models/model.ckpt")
-        print("Model Saved")
+        if episode % 5 == 0:
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            saver.save(sess, "./models/model-{}.ckpt".format(time))
+            saver.save(sess, "./models/latest_model.ckpt")
+            print("Model Saved")
+
+            subprocess.run(['python', 'play.py'])

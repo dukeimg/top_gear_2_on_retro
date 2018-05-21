@@ -11,6 +11,7 @@ from gym.envs.classic_control.rendering import SimpleImageViewer
 from dqn.model import DQNetwork
 
 parser = argparse.ArgumentParser()
+parser.add_argument('model', nargs='?', help='model to use', default='latest_model')
 parser.add_argument('state', nargs='?', help='the initial state file to load, minus the extension')
 parser.add_argument('--verbose', '-v', action='count', default=1, help='increase verbosity (can be specified multiple times)')
 parser.add_argument('--quiet', '-q', action='count', default=0, help='decrease verbosity (can be specified multiple times)')
@@ -39,7 +40,7 @@ def process_image(img):
     return np.mean(img, -1)
 
 
-env = retro.make('TopGear2-Genesis', retro.STATE_DEFAULT)
+env = retro.make('TopGear2-Genesis', args.state or retro.STATE_DEFAULT)
 
 action_space = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -65,7 +66,7 @@ DQNetwork = DQNetwork(state_size, action_size, learning_rate)
 saver = tf.train.Saver()
 
 with tf.Session() as sess:
-    saver.restore(sess, "./models/model.ckpt")
+    saver.restore(sess, "./models/{}.ckpt".format(args.model or 'latest_model'))
     done = False
 
     env.reset()
