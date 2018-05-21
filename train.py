@@ -17,7 +17,7 @@ from dqn.model import DQNetwork
 
 parser = argparse.ArgumentParser()
 parser.add_argument('state', nargs='?', help='the initial state file to load, minus the extension')
-parser.add_argument('--scenario', '-s', default='scenario', help='the scenario file to load, minus the extension')
+parser.add_argument('scenario', nargs='?', default='scenario', help='the scenario file to load, minus the extension')
 parser.add_argument('--verbose', '-v', action='count', default=1, help='increase verbosity (can be specified multiple times)')
 parser.add_argument('--quiet', '-q', action='count', default=0, help='decrease verbosity (can be specified multiple times)')
 args = parser.parse_args()
