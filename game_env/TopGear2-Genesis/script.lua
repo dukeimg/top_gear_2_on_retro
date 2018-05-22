@@ -21,7 +21,7 @@ function reward ()
   end
 
   -- if car goes on the grass on the right side
-  if data.side == 0 and data.pos > 220 then
+  if data.side == 0 and data.pos > 220  or data.side == 1 then
     newreward = newreward - 100
   end
 
