@@ -200,6 +200,8 @@ with tf.Session(config=config) as sess:
                 step += 1
                 next_state, reward, done, info = env.step(convert_action(high=action))
             total_reward += reward
+            if verbosity == 0:
+                print(info)
 
             # TODO: show in verbose mode
             # print(reward)
