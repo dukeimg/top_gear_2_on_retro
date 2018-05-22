@@ -45,7 +45,7 @@ learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # Training hyperparameters
 total_episodes = 100        # Total episodes for training
-max_steps = 500            # Max possible steps in an episode
+max_steps = 12000          # Max possible steps in an episode
 batch_size = 16
 
 # Exploration parameters for epsilon greedy strategy
