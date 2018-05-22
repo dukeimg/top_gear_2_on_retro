@@ -9,8 +9,13 @@ function reward ()
 
   newreward = newreward + speedreward
 
-  -- if car goes on the grass on left side or right side
-  if data.side == 255 and data.pos < 35 or data.side == 0 and data.pos > 220 then
+  -- if car goes on the grass on the left side
+  if data.side == 255 and data.pos < 35 or data.side == 254 then
+    newreward = newreward - 100
+  end
+
+  -- if car goes on the grass on the right side
+  if data.side == 0 and data.pos > 220 then
     newreward = newreward - 100
   end
 
