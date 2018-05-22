@@ -45,8 +45,8 @@ learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # Training hyperparameters
 total_episodes = 100        # Total episodes for training
-max_steps = 12000            # Max possible steps in an episode
-batch_size = 32
+max_steps = 500            # Max possible steps in an episode
+batch_size = 16
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
@@ -58,7 +58,7 @@ gamma = 0.99
 
 # Memory hyperparameters
 pretrain_length = batch_size
-memory_size = 50000
+memory_size = 1000000
 
 viewer = SimpleImageViewer()
 
@@ -272,7 +272,7 @@ with tf.Session(config=config) as sess:
         if episode % 5 == 0:
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             saver.save(sess, "./models/model-{}.ckpt".format(time))
-            saver.save(sess, "./models/latest_model.ckpt")
             print("Model Saved")
 
-            subprocess.run(['python', 'play.py'])
+        saver.save(sess, "./models/latest_model.ckpt")
+        subprocess.run(['python', 'play.py'])
