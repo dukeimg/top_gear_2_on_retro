@@ -201,7 +201,7 @@ with tf.Session(config=config) as sess:
                 next_state, reward, done, info = env.step(convert_action(high=action))
             total_reward += reward
             if verbosity == 0:
-                print(info)
+                print('Ep {}, step {}'.format(episode, step), info)
 
             # TODO: show in verbose mode
             # print(reward)
