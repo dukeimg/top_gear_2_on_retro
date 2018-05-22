@@ -10,7 +10,6 @@ import numpy as np
 import tensorflow as tf
 
 from collections import deque
-from gym.envs.classic_control.rendering import SimpleImageViewer
 
 from dqn.memory import Memory
 from dqn.model import DQNetwork
@@ -22,6 +21,9 @@ parser.add_argument('--verbose', '-v', action='count', default=1, help='increase
 parser.add_argument('--quiet', '-q', action='count', default=0, help='decrease verbosity (can be specified multiple times)')
 args = parser.parse_args()
 verbosity = args.verbose - args.quiet
+
+if verbosity > 0:
+    from gym.envs.classic_control.rendering import SimpleImageViewer
 
 action_space = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -60,7 +62,8 @@ gamma = 0.99
 pretrain_length = batch_size
 memory_size = 1000000
 
-viewer = SimpleImageViewer()
+if verbosity > 0:
+    viewer = SimpleImageViewer()
 
 env = retro.make('TopGear2-Genesis', args.state or retro.STATE_DEFAULT)
 
@@ -203,7 +206,8 @@ with tf.Session(config=config) as sess:
             # if info.get('side') == 255 and info.get('pos') < 35 or info.get('side') == 0 and info.get('pos') > 220:
             #     print('Grass!')
 
-            render(env.img)
+            if verbosity > 0:
+                render(env.img)
 
             # If the game is finished
             if done or info.get('lap') == 1:
@@ -272,6 +276,7 @@ with tf.Session(config=config) as sess:
         if episode % 5 == 0:
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             saver.save(sess, "./models/model-{}.ckpt".format(time))
-            saver.save(sess, "./models/latest_model.ckpt")
-            subprocess.run(['python', 'play.py'])
+            if verbosity > 0:
+                saver.save(sess, "./models/latest_model.ckpt")
+                subprocess.run(['python', 'play.py'])
             print("Model Saved")
