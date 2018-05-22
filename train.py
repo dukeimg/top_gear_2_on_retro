@@ -60,7 +60,7 @@ gamma = 0.99
 
 # Memory hyperparameters
 pretrain_length = batch_size
-memory_size = 1000000
+memory_size = 50000
 
 if verbosity > 0:
     viewer = SimpleImageViewer()
