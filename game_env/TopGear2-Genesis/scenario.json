@@ -7,7 +7,7 @@
     }
   },
   "scripts": [
-    "script.lua"
+    "script2.lua"
   ],
   "reward": {
     "script": "lua:reward"

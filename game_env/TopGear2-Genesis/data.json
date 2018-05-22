@@ -23,6 +23,10 @@
     "pos": {
       "address": 16718031,
       "type": ">u1"
+    },
+    "progress": {
+      "address": 16718026,
+      "type": ">u2"
     }
   }
 }
