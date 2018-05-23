@@ -102,7 +102,7 @@ stacked_frames = deque([np.zeros(frame_shape, dtype=np.int) for i in range(stack
 tf.reset_default_graph()
 
 # Instantiate the DQNetwork
-DQNetwork = DQNetwork(state_size, action_size, learning_rate, batch_size)
+DQNetwork = DQNetwork(state_size, action_size, learning_rate)
 
 # Instantiate memory
 memory = Memory(max_size=memory_size)
