@@ -46,7 +46,7 @@ action_size = possible_actions.__len__()
 learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # Training hyperparameters
-total_episodes = 100        # Total episodes for training
+total_episodes = 101        # Total episodes for training
 max_steps = 12000          # Max possible steps in an episode
 batch_size = 64
 
@@ -271,7 +271,7 @@ with tf.Session(config=config) as sess:
 
         # Save model every 5 episodes
         if episode % 5 == 0:
-            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            time = datetime.datetime.now().strftime('ep-{}-%Y-%m-%d %H:%M:%S'.format(episode))
             saver.save(sess, "./models/model-{}.ckpt".format(time))
             if verbosity > 0:
                 saver.save(sess, "./models/latest_model.ckpt")
