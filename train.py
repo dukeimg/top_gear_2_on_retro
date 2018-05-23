@@ -16,7 +16,7 @@ from dqn.model import DQNetwork
 
 parser = argparse.ArgumentParser()
 parser.add_argument('state', nargs='?', help='the initial state file to load, minus the extension')
-parser.add_argument('scenario', nargs='?', default='scenario', help='the scenario file to load, minus the extension')
+parser.add_argument('--scenario', '-s', default='scenario', help='the scenario file to load, minus the extension')
 parser.add_argument('--verbose', '-v', action='count', default=1, help='increase verbosity (can be specified multiple times)')
 parser.add_argument('--quiet', '-q', action='count', default=0, help='decrease verbosity (can be specified multiple times)')
 args = parser.parse_args()
@@ -65,7 +65,7 @@ memory_size = 50000
 if verbosity > 0:
     viewer = SimpleImageViewer()
 
-env = retro.make('TopGear2-Genesis', args.state or retro.STATE_DEFAULT)
+env = retro.make('TopGear2-Genesis', args.state or retro.STATE_DEFAULT, scenario=args.scenario)
 
 
 def stack_frames(stacked_frames, state):
@@ -202,11 +202,6 @@ with tf.Session(config=config) as sess:
             total_reward += reward
             if verbosity == 0:
                 print('Ep {}, step {}'.format(episode, step), info)
-
-            # TODO: show in verbose mode
-            # print(reward)
-            # if info.get('side') == 255 and info.get('pos') < 35 or info.get('side') == 0 and info.get('pos') > 220:
-            #     print('Grass!')
 
             if verbosity > 0:
                 render(env.img)
