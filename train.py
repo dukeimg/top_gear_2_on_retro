@@ -46,9 +46,9 @@ action_size = possible_actions.__len__()
 learning_rate = 0.0002      # Alpha (aka learning rate)
 
 # Training hyperparameters
-total_episodes = 101        # Total episodes for training
+total_episodes = 51        # Total episodes for training
 max_steps = 12000          # Max possible steps in an episode
-batch_size = 64
+batch_size = 128
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0            # exploration probability at start
@@ -60,7 +60,7 @@ gamma = 0.99
 
 # Memory hyperparameters
 pretrain_length = batch_size
-memory_size = 16000
+memory_size = 18000
 
 if verbosity > 0:
     viewer = SimpleImageViewer()
@@ -153,8 +153,8 @@ config.intra_op_parallelism_threads = 0
 config.inter_op_parallelism_threads = 0
 with tf.Session(config=config) as sess:
     # Initialize the variables
-    sess.run(tf.global_variables_initializer())
-    # saver.restore(sess, "./models/model-2018-05-21 20:56:02.ckpt")
+    # sess.run(tf.global_variables_initializer())
+    saver.restore(sess, "./models/model-ep-90-2018-05-24 10:40:55.ckpt")
 
     decay_step = 0
     min_position = 20
