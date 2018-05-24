@@ -162,7 +162,8 @@ def make_batch(batch_size):
         while np.array_equal(process_image(prev_state), process_image(next_state)):
             next_state, reward, done, info = env.step(convert_action(high=action))
 
-        render(env.img)
+        if verbosity > 0:
+            render(env.img)
 
         # Store results
         states.append(state)
